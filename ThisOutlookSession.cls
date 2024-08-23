@@ -8,6 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = True
 Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
+    Dim userMailbox As String
     Dim inbox As Outlook.Folder
     Dim spamFolder As Outlook.Folder
     Dim mailItem As Outlook.mailItem
@@ -19,8 +20,16 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
     Dim prompt As String
     Dim emailBody As String
     
-    ' Set the inbox and spam folders
-    Set inbox = Application.Session.GetDefaultFolder(olFolderInbox)
+    ' Set the user's mailbox email address
+    userMailbox = "user@example.com" ' Replace with the actual email address
+    
+    ' Get the target mailbox's Inbox folder
+    Set inbox = GetInboxFolder(userMailbox)
+    If inbox Is Nothing Then
+        MsgBox "Inbox not found for user: " & userMailbox, vbCritical, "Error"
+        Exit Sub
+    End If
+
     On Error Resume Next
     Set spamFolder = inbox.Folders("Spam")
     If spamFolder Is Nothing Then
@@ -38,7 +47,6 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
         
         ' Create the prompt from subject and body
         prompt = "Subject: " & mailItem.Subject & vbCrLf & "Body: " & emailBody
-        'prompt = "Subject: " & mailItem.Subject & vbCrLf & "Body: " & mailItem.Body
         
         ' Escape special characters in the prompt
         prompt = Replace(prompt, "\", "\\")  ' Escape backslashes
@@ -47,7 +55,7 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
         prompt = Replace(prompt, vbTab, "\t") ' Replace tabs with \t
 
         ' Create the JSON payload
-        jsonData = "{""model"": ""email-spam-ollama3.1"", ""prompt"": """ & prompt & """, ""stream"": false}"
+        jsonData = "{""model"": ""daniel-spam-ollama3.1"", ""prompt"": """ & prompt & """, ""stream"": false}"
 
         ' Send POST request to API
         Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -78,6 +86,24 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
         End If
     End If
 End Sub
+
+Private Function GetInboxFolder(ByVal userEmail As String) As Outlook.Folder
+    Dim ns As Outlook.NameSpace
+    Dim recipient As Outlook.recipient
+    Dim inbox As Outlook.Folder
+    
+    Set ns = Application.Session
+    Set recipient = ns.CreateRecipient(userEmail)
+    recipient.Resolve
+    
+    If recipient.Resolved Then
+        Set inbox = ns.GetSharedDefaultFolder(recipient, olFolderInbox)
+    Else
+        Set inbox = Nothing
+    End If
+    
+    Set GetInboxFolder = inbox
+End Function
 
 Private Function ContainsExactClassification(ByVal response As String) As Boolean
     ' The exact string to match
@@ -121,3 +147,4 @@ Private Function GetPlainTextFromMailItem(ByVal mailItem As Outlook.mailItem) As
 
     GetPlainTextFromMailItem = plainText
 End Function
+
