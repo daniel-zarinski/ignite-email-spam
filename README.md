@@ -43,6 +43,12 @@ ollama run email-spam-ollama3.1
 
 1. After importing, you should see the new class module listed under the "Class Modules" folder in the **Project Explorer**.
 2. Double-click on the class module to view its contents.
+3. Copy the contents of that file to your ThisOutlookSession
+4. Delete ThisOutlookSession1 by right clicking it -> remove.
+
+### Step 5: Configure email
+
+1. `Update the userMailbox = "user@example.com" ' Replace with the actual email address`
 
 ### Step 5: Save the Project
 
@@ -57,7 +63,15 @@ The modelfile contains the system message that the local LLM will use.
 - Replace `PERSON_NAME` with the full name of the person. Note this appears a few times.
 - Replace `JOB_TITLE` with the job title
 
+Run the below command to update the LLM.
+
+```PowerShell
+ollama create email-spam-ollama3.1 -f .\Modelfile
+```
+
 ## Visual Basic Script
 
 Replace the following line:
 `userMailbox = "user@example.com" ' Replace with the actual email address`
+
+# EXPLAIN TOOL SETUP
