@@ -55,7 +55,7 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
         prompt = Replace(prompt, vbTab, "\t") ' Replace tabs with \t
 
         ' Create the JSON payload
-        jsonData = "{""model"": ""daniel-spam-ollama3.1"", ""prompt"": """ & prompt & """, ""stream"": false}"
+        jsonData = "{""model"": ""email-spam-ollama3.1"", ""prompt"": """ & prompt & """, ""stream"": false}"
 
         ' Send POST request to API
         Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -81,8 +81,8 @@ Private Sub Application_NewMailEx(ByVal EntryIDCollection As String)
         If ContainsExactClassification(response) Then
             ' Move the email to the Spam folder
             mailItem.Move spamFolder
-        Else
-            MsgBox response, vbInformation, "Response NOT Spam"
+        'Else
+        '    MsgBox response, vbInformation, "Response NOT Spam"
         End If
     End If
 End Sub
