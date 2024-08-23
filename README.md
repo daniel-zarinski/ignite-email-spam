@@ -73,5 +73,3 @@ ollama create email-spam-ollama3.1 -f .\Modelfile
 
 Replace the following line:
 `userMailbox = "user@example.com" ' Replace with the actual email address`
-
-# EXPLAIN TOOL SETUP
